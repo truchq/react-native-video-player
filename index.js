@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes } from 'react-native';
+import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video'; // eslint-disable-line
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const BackgroundImage = ImageBackground || Image; // fall back to Image if RN < 0.46
+
+let ViewPropTypesVar
+
+if (ViewPropTypes) {
+  ViewPropTypesVar = ViewPropTypes
+} else {
+  ViewPropTypesVar = View.propTypes
+}
 
 const styles = StyleSheet.create({
   preloadingPlaceholder: {
@@ -93,6 +101,7 @@ export default class VideoPlayer extends Component {
     this.state = {
       isStarted: props.autoplay,
       isPlaying: props.autoplay,
+      hasEnded: false,
       width: 200,
       progress: 0,
       isMuted: props.defaultMuted,
@@ -149,6 +158,7 @@ export default class VideoPlayer extends Component {
     this.setState(state => ({
       isPlaying: true,
       isStarted: true,
+      hasEnded: false,
       progress: state.progress === 1 ? 0 : state.progress,
     }));
 
@@ -173,8 +183,8 @@ export default class VideoPlayer extends Component {
       this.props.onEnd(event);
     }
 
-    if (this.props.endWithThumbnail) {
-      this.setState({ isStarted: false });
+    if (this.props.endWithThumbnail || this.props.endThumbnail) {
+      this.setState({ isStarted: false, hasEnded: true });
       this.player.dismissFullscreenPlayer();
     }
 
@@ -219,7 +229,7 @@ export default class VideoPlayer extends Component {
       isMuted,
     });
     this.showControls();
-    
+
   }
 
   onToggleFullScreen() {
@@ -357,8 +367,8 @@ export default class VideoPlayer extends Component {
     );
   }
 
-  renderThumbnail() {
-    const { thumbnail, style, customStyles, ...props } = this.props;
+  renderThumbnail(thumbnail) {
+    const { style, customStyles, ...props } = this.props;
     return (
       <BackgroundImage
         {...props}
@@ -536,11 +546,14 @@ export default class VideoPlayer extends Component {
   }
 
   renderContent() {
-    const { thumbnail, style } = this.props;
-    const { isStarted } = this.state;
+    const { thumbnail, endThumbnail, style } = this.props;
+    const { isStarted, hasEnded } = this.state;
 
-    if (!isStarted && thumbnail) {
-      return this.renderThumbnail();
+    if (hasEnded && endThumbnail) {
+      return this.renderThumbnail(endThumbnail);
+    }
+    else if (!isStarted && thumbnail) {
+      return this.renderThumbnail(thumbnail);
     } else if (!isStarted) {
       return (
         <View style={[styles.preloadingPlaceholder, this.getSizeStyles(), style]}>
@@ -563,6 +576,7 @@ export default class VideoPlayer extends Component {
 VideoPlayer.propTypes = {
   video: Video.propTypes.source,
   thumbnail: Image.propTypes.source,
+  endThumbnail: Image.propTypes.source,
   videoWidth: PropTypes.number,
   videoHeight: PropTypes.number,
   duration: PropTypes.number,
@@ -570,7 +584,7 @@ VideoPlayer.propTypes = {
   paused: PropTypes.bool,
   defaultMuted: PropTypes.bool,
   muted: PropTypes.bool,
-  style: ViewPropTypes.style,
+  style: ViewPropTypesVar.style,
   controlsTimeout: PropTypes.number,
   disableControlsAutoHide: PropTypes.bool,
   disableFullscreen: PropTypes.bool,
@@ -582,20 +596,20 @@ VideoPlayer.propTypes = {
   pauseOnPress: PropTypes.bool,
   fullScreenOnLongPress: PropTypes.bool,
   customStyles: PropTypes.shape({
-    wrapper: ViewPropTypes.style,
+    wrapper: ViewPropTypesVar.style,
     video: Video.propTypes.style,
-    videoWrapper: ViewPropTypes.style,
-    controls: ViewPropTypes.style,
+    videoWrapper: ViewPropTypesVar.style,
+    controls: ViewPropTypesVar.style,
     //playControl: TouchableOpacity.propTypes.style,
     //controlButton: TouchableOpacity.propTypes.style,
     controlIcon: Icon.propTypes.style,
     playIcon: Icon.propTypes.style,
-    seekBar: ViewPropTypes.style,
-    seekBarFullWidth: ViewPropTypes.style,
-    seekBarProgress: ViewPropTypes.style,
-    seekBarKnob: ViewPropTypes.style,
-    seekBarKnobSeeking: ViewPropTypes.style,
-    seekBarBackground: ViewPropTypes.style,
+    seekBar: ViewPropTypesVar.style,
+    seekBarFullWidth: ViewPropTypesVar.style,
+    seekBarProgress: ViewPropTypesVar.style,
+    seekBarKnob: ViewPropTypesVar.style,
+    seekBarKnobSeeking: ViewPropTypesVar.style,
+    seekBarBackground: ViewPropTypesVar.style,
     thumbnail: Image.propTypes.style,
     //playButton: TouchableOpacity.propTypes.style,
     playArrow: Icon.propTypes.style,
