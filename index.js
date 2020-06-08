@@ -108,6 +108,7 @@ export default class VideoPlayer extends Component {
       isControlsVisible: !props.hideControlsOnStart,
       duration: 0,
       isSeeking: false,
+      isRepeat: false
     };
 
     this.seekBarWidth = 200;
@@ -435,6 +436,12 @@ export default class VideoPlayer extends Component {
   fastForward = () => {
     this.player.seek(this.state.currentTime + 5);
   }
+  repeat = () => {
+    this.setState({
+      isRepeat: !this.state.isRepeat,
+    });
+    this.showControls();
+  }
   renderControls() {
     const { customStyles } = this.props;
     return (
@@ -465,7 +472,15 @@ export default class VideoPlayer extends Component {
               style={[styles.playControl, customStyles.controlIcon, customStyles.playIcon]}
               name="fast-forward-10" />
         </TouchableOpacity>
-       
+        <TouchableOpacity
+          onPress={this.repeat}
+          style={[customStyles.controlButton, customStyles.playControl]}
+        >
+           <Icons size={20} 
+              style={[styles.playControl, customStyles.controlIcon, customStyles.playIcon]}
+              name={ this.state.isRepeat ? 'repeat-once': 'repeat-off'} />
+        </TouchableOpacity>
+        
         {this.renderSeekBar()}
         {this.props.muted ? null : (
           <TouchableOpacity onPress={this.onMutePress} style={customStyles.controlButton}>
@@ -519,6 +534,7 @@ export default class VideoPlayer extends Component {
           onLoad={this.onLoad}
           source={video}
           resizeMode={resizeMode}
+          repeat={this.state.isRepeat}
         />
         <View
           style={[
@@ -548,7 +564,6 @@ export default class VideoPlayer extends Component {
   renderContent() {
     const { thumbnail, endThumbnail, style } = this.props;
     const { isStarted, hasEnded } = this.state;
-
     if (hasEnded && endThumbnail) {
       return this.renderThumbnail(endThumbnail);
     }
