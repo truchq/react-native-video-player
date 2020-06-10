@@ -480,9 +480,11 @@ export default class VideoPlayer extends Component {
   }
   rewind = () => {
     this.player.seek(this.state.currentTime - 5);
+    this.showControls();
   }
   fastForward = () => {
     this.player.seek(this.state.currentTime + 5);
+    this.showControls();
   }
   repeat = () => {
     this.setState({
