@@ -79,7 +79,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     //marginLeft: -10,
     //marginRight: -5,
-    paddingVertical: 5
+    //marginVertical: 5
+    //paddingBottom: 10
   },
   seekBarFullWidth: {
     marginLeft: 0,
@@ -109,9 +110,9 @@ const styles = StyleSheet.create({
   overlayButton: {
     flex: 1,
   },
-  cbw: { minWidth: '33%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cfe: { minWidth: '33%', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' },
-  cfs: { minWidth: '33%', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' },
+  cbw: { maxWidth: '33%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  cfe: { maxWidth: '33%', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' },
+  cfs: { maxWidth: '33%', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 5 },
   boxTimeHumanize: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -386,6 +387,11 @@ export default class VideoPlayer extends Component {
     });
     this.showControls();
   }
+  rate(rate) {
+    this.setState({
+      rate
+    });
+  }
 
   renderStartButton() {
     const { customStyles } = this.props;
@@ -433,6 +439,7 @@ export default class VideoPlayer extends Component {
             fullWidth ? styles.seekBarFullWidth : {},
             customStyles.seekBar,
             fullWidth ? customStyles.seekBarFullWidth : {},
+            {paddingVertical: this.state.isControlsVisible ? 5: 0}
           ]}
           onLayout={this.onSeekBarLayout}
         >
@@ -490,18 +497,32 @@ export default class VideoPlayer extends Component {
         <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
 
           <View style={styles.cfs}>
-            {this.props.muted ? null : (
-              <TouchableOpacity onPress={this.onMutePress} style={[customStyles.controlButton]}>
-                <Icon
-                  style={[styles.iconControl, customStyles.controlIcon]}
-                  name={this.state.isMuted ? 'volume-off' : 'volume-up'}
-                  size={20}
-                />
-              </TouchableOpacity>
-            )}
+
+            <TouchableOpacity
+              onPress={() => this.rate(0.5)}
+              style={[customStyles.controlButton, customStyles.iconControl]}
+            >
+              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: '#fff', fontSize: 10 }}>0.5x</Text></View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.rate(1)}
+              style={[customStyles.controlButton, customStyles.iconControl]}
+            >
+              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: '#fff', fontSize: 10 }}>1x</Text></View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.rate(1.5)}
+              style={[customStyles.controlButton, customStyles.iconControl]}
+            >
+              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: '#fff', fontSize: 10 }}>1.5x</Text></View>
+            </TouchableOpacity>
+
           </View>
 
           <View style={styles.cbw}>
+
+
+
             <TouchableOpacity
               onPress={this.rewind}
               style={[customStyles.controlButton, customStyles.iconControl]}
@@ -532,6 +553,15 @@ export default class VideoPlayer extends Component {
             </TouchableOpacity>
           </View>
           <View style={styles.cfe}>
+            {this.props.muted ? null : (
+              <TouchableOpacity onPress={this.onMutePress} style={[customStyles.controlButton]}>
+                <Icon
+                  style={[styles.iconControl, customStyles.controlIcon]}
+                  name={this.state.isMuted ? 'volume-off' : 'volume-up'}
+                  size={20}
+                />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               onPress={this.repeat}
               style={[customStyles.controlButton, customStyles.iconControl]}
@@ -588,11 +618,11 @@ export default class VideoPlayer extends Component {
           source={video}
           resizeMode={resizeMode}
           repeat={this.state.isRepeat}
+          rate={this.state.rate}
         />
         <View
           style={[
-            this.getSizeStyles(),
-            { marginTop: -this.getSizeStyles().height },
+            { position: 'absolute', top: 0, left: 0, bottom: 0, right: 0 }
           ]}
         >
           <TouchableOpacity
