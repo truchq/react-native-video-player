@@ -139,7 +139,8 @@ export default class VideoPlayer extends Component {
       isControlsVisible: !props.hideControlsOnStart,
       duration: 0,
       isSeeking: false,
-      isRepeat: false
+      isRepeat: false,
+      rate: 1
     };
 
     this.seekBarWidth = 200;
@@ -424,7 +425,7 @@ export default class VideoPlayer extends Component {
   }
 
   renderSeekBar(fullWidth) {
-    const { customStyles, disableSeek } = this.props;
+    const { customStyles, disableSeek, isPlayer } = this.props;
     return (
       <View>
         {this.state.isControlsVisible && (
@@ -439,7 +440,7 @@ export default class VideoPlayer extends Component {
             fullWidth ? styles.seekBarFullWidth : {},
             customStyles.seekBar,
             fullWidth ? customStyles.seekBarFullWidth : {},
-            {paddingVertical: this.state.isControlsVisible ? 5: 0}
+            {paddingVertical: this.state.isControlsVisible || isPlayer ? 5: 0}
           ]}
           onLayout={this.onSeekBarLayout}
         >
@@ -502,27 +503,24 @@ export default class VideoPlayer extends Component {
               onPress={() => this.rate(0.5)}
               style={[customStyles.controlButton, customStyles.iconControl]}
             >
-              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: '#fff', fontSize: 10 }}>0.5x</Text></View>
+              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: this.state.rate === 0.5 ? 'red' : '#fff', fontSize: 10 }}>0.5x</Text></View>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => this.rate(1)}
               style={[customStyles.controlButton, customStyles.iconControl]}
             >
-              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: '#fff', fontSize: 10 }}>1x</Text></View>
+              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: this.state.rate === 1 ? 'red' : '#fff', fontSize: 10 }}>1x</Text></View>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => this.rate(1.5)}
               style={[customStyles.controlButton, customStyles.iconControl]}
             >
-              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: '#fff', fontSize: 10 }}>1.5x</Text></View>
+              <View style={{ borderWidth: 1, borderColor: '#fff', margin: 4, padding: 2, borderRadius: 1 }}><Text style={{ color: this.state.rate === 1.5 ? 'red' : '#fff', fontSize: 10 }}>1.5x</Text></View>
             </TouchableOpacity>
 
           </View>
 
           <View style={styles.cbw}>
-
-
-
             <TouchableOpacity
               onPress={this.rewind}
               style={[customStyles.controlButton, customStyles.iconControl]}
@@ -564,7 +562,7 @@ export default class VideoPlayer extends Component {
             )}
             <TouchableOpacity
               onPress={this.repeat}
-              style={[customStyles.controlButton, customStyles.iconControl]}
+              style={[customStyles.controlButton]}
             >
               <Icons size={20}
                 style={[styles.iconControl, customStyles.controlIcon, customStyles.playIcon]}
@@ -595,6 +593,7 @@ export default class VideoPlayer extends Component {
       pauseOnPress,
       fullScreenOnLongPress,
       customStyles,
+      isPlayer,
       ...props
     } = this.props;
     return (
@@ -638,7 +637,7 @@ export default class VideoPlayer extends Component {
             }}
           />
         </View>
-        {((!this.state.isPlaying) || this.state.isControlsVisible)
+        {((!this.state.isPlaying) || (this.state.isControlsVisible) || isPlayer)
           ? this.renderControls() : this.renderSeekBar(true)}
       </View>
     );
