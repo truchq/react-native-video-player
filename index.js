@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   playArrow: {
     color: 'white',
   },
-  video: Platform.Version >= 24 ? {} : {
+  video: {
     backgroundColor: 'black',
   },
   controls: {
